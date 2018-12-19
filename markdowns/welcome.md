@@ -7,13 +7,13 @@
 import java.util.*;
 
 public class Connect4 {
-
     public static Scanner in = new Scanner(System.in);
     public static int invertChance = 1;
     public static int drillChance = 1;
     public static boolean inverted = false;
 
 	public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
         // prints the rules of the game
         System.out.println("\n\n\t These are the Rules:\n" + 
                            "You can win on a Special Move\n" + 
@@ -49,6 +49,7 @@ public class Connect4 {
         } else {
             System.out.println("Something went wrong.\nPlease reboot this programm.");
         }
+        in.close();
     }
 
     // checks if there is a winner
@@ -57,7 +58,7 @@ public class Connect4 {
         boolean isWin = false;
         outerHorizontal:
         for(int a = 0; a < board.length; a++) {
-            for(int b = 0; b < board[a].length - 4; b++) {
+            for(int b = 0; b < board[a].length - 3; b++) {
                 play = board[a][b];
                 if(play == " ")
                     continue;
@@ -235,6 +236,11 @@ public class Connect4 {
             board = updateBoard(board, askForPlay(in), player);            
             if(winPlay(board, "Player 1", "Player 2"))
                 break;
+            if(checkDraw(board)){
+                System.out.println("You're all bad at this");
+                break;
+            }
+
             player = 2;
 
             // player 2
@@ -243,8 +249,22 @@ public class Connect4 {
             board = updateBoard(board, askForPlay(in), player);            
             if(winPlay(board, "Player 2", "Player 1"))
                 break;
+            if(checkDraw(board)){
+                System.out.println("You're all bad at this");
+                break;
+            }
             player = 1;
         }
+        /* FIXME
+        Scanner in = new Scanner(System.in);
+        System.out.print("Would you like to play again? ");
+        String again = in.next().substring(0, 1);
+        in.close();
+        if(again.equalsIgnoreCase("y"))
+            new C4caller().start();
+        else
+            System.out.println("Alright. Have a nice day!");
+        */
     }
 
     // singleplayer as player 1
@@ -257,6 +277,10 @@ public class Connect4 {
             board = updateBoard(board, askForPlay(in), player);            
             if(winPlay(board, "Player 1", "AI"))
                 break;
+            if(checkDraw(board)){
+                System.out.println("You're all bad at this");
+                break;
+            }
             player = 2;
 
             // player 2
@@ -267,6 +291,16 @@ public class Connect4 {
                 break;
             player = 1;
         }
+        /* FIXME
+        Scanner in = new Scanner(System.in);
+        System.out.print("Would you like to play again? ");
+        String again = in.next().substring(0, 1);
+        in.close();
+        if(again.equalsIgnoreCase("y"))
+            new C4caller().start();
+        else
+            System.out.println("Alright. Have a nice day!");
+        */
     }
 
     // singleplayer as player 2
@@ -279,6 +313,10 @@ public class Connect4 {
             board = updateBoard(board, AI(new Random(), board), player);            
             if(winPlay(board, "AI", "Player 2"))
                 break;
+            if(checkDraw(board)){
+                System.out.println("You're all bad at this");
+                break;
+            }
             player = 2;
 
             // player 2
@@ -287,8 +325,22 @@ public class Connect4 {
             board = updateBoard(board, askForPlay(in), player);            
             if(winPlay(board, "Player 2", "AI"))
                 break;
+            if(checkDraw(board)){
+                System.out.println("You're all bad at this");
+                break;
+            }
             player = 1;
         }
+        /* FIXME
+        Scanner in = new Scanner(System.in);
+        System.out.print("Would you like to play again? ");
+        String again = in.next().substring(0, 1);
+        in.close();
+        if(again.equalsIgnoreCase("y"))
+            new C4caller().start();
+        else
+            System.out.println("Alright. Have a nice day!");
+        */
     }
 
     // prints out the winning play
@@ -296,11 +348,32 @@ public class Connect4 {
         if(checkForWinner(board)) {
                 printBoard(board);
                 if(!inverted)
-                    System.out.println(player + " won!");
-                else
                     System.out.println(otherPlayer + " won!");
+                else
+                    System.out.println(player + " won!");
         }
         return(checkForWinner(board));
+    }
+
+    public static void playAgain() {
+        Scanner in = new Scanner(System.in);
+        System.out.print("Would you like to play again? ");
+        String again = in.next().substring(0, 1);
+        in.close();
+        if(again.equalsIgnoreCase("y"))
+            new Connect4().start();
+        else
+            System.out.println("Alright. Have a nice day!");
+    }
+
+    public static boolean checkDraw(String[][] board) {
+        for(int n = 0; n < board.length; n++) {
+            for(int a = 0; a < board[n].length; a++) {
+                if(board[n][a] == " ")
+                    return false;
+            }
+        }
+        return true;
     }
 
 }
