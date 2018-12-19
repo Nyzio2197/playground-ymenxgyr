@@ -2,7 +2,7 @@
 // 1. Invert: inverts the plays on the move
 // 2. Drill: clears the column the play is played into, including the play
 // All other rules of connect 4 are the same
-{}
+
 
 import java.util.*;
 
