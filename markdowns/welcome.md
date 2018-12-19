@@ -7,7 +7,6 @@
 import java.util.*;
 
 public class Connect4 {
-
     public static Scanner in = new Scanner(System.in);
     public static int invertChance = 1;
     public static int drillChance = 1;
@@ -29,15 +28,21 @@ public class Connect4 {
         // ask for the mode
         System.out.print("Multiplayer or Singleplayer? ");
         String choice = in.next().substring(0, 1);
-        if(choice.equalsIgnoreCase("m"))
+        if(choice.equalsIgnoreCase("m")) {
+            System.out.println("\n");
             multiplayer(board);
+        }
         else if(choice.equalsIgnoreCase("s")) {
             System.out.print("As player 1 or player 2 (type the digit)? ");
             int choice2 = in.nextInt();        
-            if(choice2 == 1)
+            if(choice2 == 1) {
+                System.out.println("\n");
                 playerOne(board);
-            else if(choice2 == 2)
+            }
+            else if(choice2 == 2) {
+                System.out.println("\n");
                 playerTwo(board);
+            }
             else
                 System.out.println("Something went wrong.\nPlease reboot this programm.");
         } else {
@@ -115,14 +120,18 @@ public class Connect4 {
 
     // prints out the board
     public static void printBoard(String[][] board) {
-        System.out.println(" + 1 + 2 + 3 + 4 + 5 + 6 + 7 +");
+        System.out.println("  $  1  $  2  $  3  $  4  $  5  $  6  $  7  $");
         for(int n = 0; n < board.length; n++) {
             for(int x = 0; x < board[n].length; x++) {
-                System.out.print(" | " + board[n][x]);
+                System.out.print("  |  " + board[n][x]);
             }
-            System.out.println(" |");
-            System.out.println(" +---+---+---+---+---+---+---+");
+            System.out.println("  |");
+            if(n < board.length - 1)
+                System.out.println("  +-----+-----+-----+-----+-----+-----+-----+");
+            else
+                 System.out.println("  $  1  $  2  $  3  $  4  $  5  $  6  $  7  $");
         }
+        // prints out the chance of a special move happening
         System.out.println("Chance of Invert Move: " + (invertChance * 2) + "%");
         System.out.println("Chance of Drill Move: " + drillChance + "%");
 
@@ -131,21 +140,25 @@ public class Connect4 {
     // updates the board to the next play
     public static String[][] updateBoard(String[][] board, int play, int player) {
         play -= 1;
-
-
         Random rand = new Random();
+        String spacing = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+
+
+        // sees if the next play is a Invert move
         boolean invert = false;
         if(rand.nextInt(50) < invertChance)
             invert = true;
         boolean notFinished = true;
 
 
+        // sees if the next play is a Drill move
         boolean drill = false;
         if(rand.nextInt(100) < drillChance)
             drill = true;
 
         
         outer:
+        // the actual play itself
         for(int n = board.length - 1; n >= 0; n--) {            
             if(board[n][play] == " ") {
                 if(player == 1) {
@@ -158,10 +171,10 @@ public class Connect4 {
             }
             // inverts all of the plays on the board
             if(invert) {
-                System.out.println("\n\t\t\t\t\t\t**********************\n" +
-                                   "\t\t\t\t\t\tINVERT MOVE!!!\n" +
-                                   "\t\t\t\t\t\tEVERYTHING IS INVERTED\n" +
-                                   "\t\t\t\t\t\t**********************\n");
+                System.out.println("\n" + spacing + "**********************\n" +
+                                   spacing + "INVERT MOVE!!!\n" +
+                                   spacing + "EVERYTHING IS INVERTED\n" +
+                                   spacing + "**********************\n");
                 for(int a = 0; a < board.length; a++) {
                     for(int b = 0; b < board[a].length; b++) {
                         if(board[a][b] == "X")
@@ -176,10 +189,10 @@ public class Connect4 {
             }
             // clears column
             if(drill) {
-                System.out.println("\n\t\t\t\t\t\t**************\n" +
-                                   "\t\t\t\t\t\tDRILL MOVE!!!\n" +
-                                   "\t\t\t\t\t\tCOLUMN CLEARED\n" +
-                                   "\t\t\t\t\t\t**************\n");
+                System.out.println("\n" + spacing + "**************\n" +
+                                   spacing + "DRILL MOVE!!!\n" +
+                                   spacing + "COLUMN CLEARED\n" +
+                                   spacing + "**************\n");
                for(int f = 0; f < board.length; f++) {
                    board[f][play] = " ";
                }
@@ -192,8 +205,9 @@ public class Connect4 {
                 break outer;
             }
         }
+        // in case the column the player chose is filled
         if(notFinished) {
-            System.out.println("That is a invalid move. Please try again.");
+            System.out.println("INVALID! Please try again.");
             updateBoard(board, askForPlay(in), player);
         }
         return board;
