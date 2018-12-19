@@ -7,6 +7,7 @@
 import java.util.*;
 
 public class Connect4 {
+
     public static Scanner in = new Scanner(System.in);
     public static int invertChance = 1;
     public static int drillChance = 1;
