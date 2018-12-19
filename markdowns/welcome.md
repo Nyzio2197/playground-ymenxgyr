@@ -1,14 +1,21 @@
+// This version has 2 special moves
+// 1. Invert: inverts the plays on the move
+// 2. Drill: clears the column the play is played into, including the play
+// All other rules of connect 4 are the same
+
 import java.util.*;
 
 public class Connect4 {
+
     public static Scanner in = new Scanner(System.in);
-    public static int chance = 1;
-    public static boolean normal = true;
+    public static int invertChance = 1;
+    public static int drillChance = 1;
     public static boolean inverted = false;
 
 	public static void main(String[] args) {
+        // prints the rules of the game
         System.out.println("\n\n\t These are the Rules:\n" + 
-                           "You cannot win on a Special Move\n" + 
+                           "You can win on a Special Move\n" + 
                            "You will win if you get 4 in a row\n" +
                            "BEGIN!\n");
 
@@ -18,7 +25,7 @@ public class Connect4 {
                             {" ", " ", " ", " ", " ", " ", " "}, 
                             {" ", " ", " ", " ", " ", " ", " "}, 
                             {" ", " ", " ", " ", " ", " ", " "}, };
-    
+        // ask for the mode
         System.out.print("Multiplayer or Singleplayer? ");
         String choice = in.next().substring(0, 1);
         if(choice.equalsIgnoreCase("m"))
@@ -37,6 +44,7 @@ public class Connect4 {
         }
     }
 
+    // checks if there is a winner
     public static boolean checkForWinner(String[][] board) {
         String play = " ";
         boolean isWin = false;
@@ -96,6 +104,7 @@ public class Connect4 {
         return isWin;
     }
 
+    // computer player
     public static int AI(Random rand, String[][] board) {
         int play = rand.nextInt(7);
         while(board[0][play] != " ")
@@ -103,6 +112,7 @@ public class Connect4 {
         return play + 1;
     }
 
+    // prints out the board
     public static void printBoard(String[][] board) {
         System.out.println(" + 1 + 2 + 3 + 4 + 5 + 6 + 7 +");
         for(int n = 0; n < board.length; n++) {
@@ -112,23 +122,30 @@ public class Connect4 {
             System.out.println(" |");
             System.out.println(" +---+---+---+---+---+---+---+");
         }
-        System.out.println("Chance of Special Move: " + (chance * 2) + "%");
+        System.out.println("Chance of Invert Move: " + (invertChance * 2) + "%");
+        System.out.println("Chance of Drill Move: " + drillChance + "%");
+
     }
 
+    // updates the board to the next play
     public static String[][] updateBoard(String[][] board, int play, int player) {
         play -= 1;
 
 
         Random rand = new Random();
-        boolean isWhite = false;
-        if(rand.nextInt(50) < chance)
-            isWhite = true;
+        boolean invert = false;
+        if(rand.nextInt(50) < invertChance)
+            invert = true;
         boolean notFinished = true;
-        boolean whiteNotHappened = true;
 
 
+        boolean drill = false;
+        if(rand.nextInt(100) < drillChance)
+            drill = true;
+
+        
         outer:
-        for(int n = board.length - 1; n > 0; n--) {            
+        for(int n = board.length - 1; n >= 0; n--) {            
             if(board[n][play] == " ") {
                 if(player == 1) {
                     board[n][play] = "O";
@@ -138,35 +155,39 @@ public class Connect4 {
                     notFinished = false;
                 }
             }
-            if(whiteNotHappened) {
-                if(isWhite) {
-                    System.out.println("\n**********************\n" +
-                                       "SPECIAL MOVE!!!\n" +
-                                       "EVERYTHING IS INVERTED\n" +
-                                       "**********************\n");
-                    for(int a = 0; a < board.length; a++) {
-                        for(int b = 0; b < board[a].length; b++) {
-                            if(board[a][b] == "X")
-                                board[a][b] = "O";
-                            else if(board[a][b] == "O")
-                                board[a][b] = "X";
-                        }
-                    }
-                    notFinished = false;
-                    whiteNotHappened = false;
-                    chance = 0;
-                    if(normal) {
-                        normal = false;
-                        inverted = true;
-                    } else {
-                        normal = true;
-                        inverted = false;
+            // inverts all of the plays on the board
+            if(invert) {
+                System.out.println("\n\t\t\t\t\t\t**********************\n" +
+                                   "\t\t\t\t\t\tINVERT MOVE!!!\n" +
+                                   "\t\t\t\t\t\tEVERYTHING IS INVERTED\n" +
+                                   "\t\t\t\t\t\t**********************\n");
+                for(int a = 0; a < board.length; a++) {
+                    for(int b = 0; b < board[a].length; b++) {
+                        if(board[a][b] == "X")
+                            board[a][b] = "O";
+                        else if(board[a][b] == "O")
+                            board[a][b] = "X";
                     }
                 }
-            
+                notFinished = false;
+                invertChance = 0;
+                inverted = !inverted;
+            }
+            // clears column
+            if(drill) {
+                System.out.println("\n\t\t\t\t\t\t**************\n" +
+                                   "\t\t\t\t\t\tDRILL MOVE!!!\n" +
+                                   "\t\t\t\t\t\tCOLUMN CLEARED\n" +
+                                   "\t\t\t\t\t\t**************\n");
+               for(int f = 0; f < board.length; f++) {
+                   board[f][play] = " ";
+               }
+               notFinished = false;
+               drillChance = 0;
             }
             if(!notFinished){
-                chance++;
+                invertChance++;
+                drillChance++;
                 break outer;
             }
         }
@@ -177,11 +198,18 @@ public class Connect4 {
         return board;
     }
 
+    // gets the next play
     public static int askForPlay(Scanner in) {
         System.out.print("Which column would you like to place into? ");
-        return Integer.parseInt(in.next().substring(0, 1));
+        int play = Integer.parseInt(in.next().substring(0, 1));
+        while(play < 1 || play > 7) {
+            System.out.print("INVALID! Retry:\nWhich column would you like to place into? ");
+            play = Integer.parseInt(in.next().substring(0, 1));
+        }
+        return play;
     }
 
+    // multiplayer mode
     public static void multiplayer(String[][] board) {
         int player = 1;
         while(true) {
@@ -203,6 +231,7 @@ public class Connect4 {
         }
     }
 
+    // singleplayer as player 1
     public static void playerOne(String[][] board) {
         int player = 1;
         while(true) {
@@ -224,6 +253,7 @@ public class Connect4 {
         }
     }
 
+    // singleplayer as player 2
     public static void playerTwo(String[][] board) {
         int player = 1;
         while(true) {
@@ -245,10 +275,11 @@ public class Connect4 {
         }
     }
 
+    // prints out the winning play
     public static boolean winPlay(String[][] board, String player, String otherPlayer) {
         if(checkForWinner(board)) {
                 printBoard(board);
-                if(normal)
+                if(!inverted)
                     System.out.println(player + " won!");
                 else
                     System.out.println(otherPlayer + " won!");
